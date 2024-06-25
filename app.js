@@ -1,14 +1,19 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
+const morgan = require('morgan');
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 //Middlewares
 app.use(express.json());
-
-// Hundlers
+app.use(morgan('dev'));
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 👋');
+  next();
+});
+// Handlers
 const getAllTours = (req, res) => {
   res.status(200).json({ status: 'success', results: tours.length, tours });
 };
@@ -67,6 +72,7 @@ app
   .patch(updateTour)
   .delete(deleteTour);
 
+//Start Server
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port} ...`);
