@@ -49,6 +49,17 @@ app.patch('/api/v1/tours/:id', (req, res) => {
 
   res.status(200).json({ status: 'success', data: { tour: 'updated tour' } });
 });
+//delete tour
+app.delete('/api/v1/tours/:id', (req, res) => {
+  const id = req.params.id * 1; //convert id in the params to int
+  if (id > tours.length) {
+    //check if the id valid
+    return res.status(404).json({ status: 'fail', message: 'Invalid id' });
+  }
+  //delete tour code Here....
+
+  res.status(204).json({ status: 'success', data: null });
+});
 
 const port = 3000;
 app.listen(port, () => {
