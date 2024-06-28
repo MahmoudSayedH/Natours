@@ -1,3 +1,4 @@
+const Tour = require('./../models/tourModel');
 exports.getAllTours = (req, res) => {
   //get all tours code Here ...
   res.status(200).json({ status: 'success', results: 'tours.length', tours: 'all tours' });
