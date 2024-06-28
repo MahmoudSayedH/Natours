@@ -22,9 +22,14 @@ exports.createTour = async (req, res) => {
   }
 };
 
-exports.getTour = (req, res) => {
-  //update single tour code Here....
-  res.status(200).json({ status: 'success', data: { tour } });
+exports.getTour = async (req, res) => {
+  try {
+    //get single tour code Here....
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json({ status: 'success', data: { tour } });
+  } catch (err) {
+    res.status(404).json({ status: 'fail', message: err });
+  }
 };
 
 exports.updateTour = (req, res) => {
