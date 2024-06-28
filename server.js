@@ -6,7 +6,7 @@ const app = require('./app');
 
 //connecting to database
 const db =
-  process.env.DATABASE_ATLAS_URL.replace('<PASSWORD>', process.env.DATABASE_ATLAS_PASSWORD) ||
+  //process.env.DATABASE_ATLAS_URL.replace('<PASSWORD>', process.env.DATABASE_ATLAS_PASSWORD) ||
   process.env.DATABASE_LOCAL;
 mongoose.connect(db).then(() => console.log('connected to db'));
 

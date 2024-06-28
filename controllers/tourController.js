@@ -36,7 +36,7 @@ exports.updateTour = async (req, res) => {
   try {
     //update tour code Here....
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); //new-->return the new updated doc & runValidator validate the new insertion
-    res.status(200).json({ status: 'success', data: { tour: 'updated tour' } });
+    res.status(200).json({ status: 'success', data: { tour } });
   } catch (err) {
     res.status(404).json({ status: 'fail', message: err });
   }
