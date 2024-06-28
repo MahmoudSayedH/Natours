@@ -3,13 +3,25 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
-exports.checkBody = (req, res, next, val) => {
+exports.checkid = (req, res, next, val) => {
   if (val * 1 > tours.length) {
     //check if the id valid
     return res.status(404).json({ status: 'fail', message: 'Invalid id' });
   }
   next();
 };
+
+//check the body of the request if it contains the name and price properties
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'missing name or price',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   res.status(200).json({ status: 'success', results: tours.length, tours });
 };
