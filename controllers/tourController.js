@@ -41,6 +41,14 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    // 4) pagination
+    //--get page and limit from query
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    //--calculate the number of skipped documents
+    const skip = (page - 1) * limit;
+    //--add number of skipped documents and limit of documents to the query object
+    query = query.skip(skip).limit(limit);
     //--pass query object to the find
     const tours = await query;
     res.status(200).json({ status: 'success', results: tours.length, data: { tours } });
