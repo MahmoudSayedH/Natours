@@ -19,15 +19,28 @@ exports.getAllTours = async (req, res) => {
 
     //2)Sorting:
     let query = Tour.find(JSON.parse(queryStr));
-    //--check if request contain sort
+    //--check if request contains sort
     if (req.query.sort) {
       //--get sort then remove the camma and put space instead if the request sort on multiple documents
       const sort = req.query.sort.split(',').join(' ');
+      //add the sort to the query
       query = query.sort(sort);
     } else {
       //if request doesnt want a sort, it will sort accourding to the new inserted tours in descending order (-)
       query = query.sort('-createdAt');
     }
+    //3)Fields: get a selected fields only
+    //--check if request contains fields
+    if (req.query.fields) {
+      //--remove the comma and add a space instead if the request want multiple fields
+      const fields = req.query.fields.split(',').join(' ');
+      //--add  fields to the query
+      query = query.select(fields);
+    } else {
+      //-- if the request doesnt have fields then remove the __v from the responsed fields
+      query = query.select('-__v');
+    }
+
     //--pass query object to the find
     const tours = await query;
     res.status(200).json({ status: 'success', results: tours.length, data: { tours } });
