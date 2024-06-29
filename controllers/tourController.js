@@ -6,21 +6,30 @@ exports.getAllTours = async (req, res) => {
     //1-A)Filtering: remove unwanted objects from the request query
     //-a-get query request
     const queryObj = { ...req.query }; //here we make a hard copy of the query request
-
     //-b-create array of excluded fields
     const excluded = ['sort', 'limit', 'page', 'fields'];
-
     //-c-remove the execluded field from the query copy
     excluded.forEach(el => delete queryObj[el]);
 
     // 1-B)Filtering;
     //-a-stringify request
     let queryStr = JSON.stringify(queryObj);
-
     //-b-search for operation and add $ before
     queryStr = queryStr.replace(/\b(gt|lt|gte|lte)\b/g, match => `$${match}`);
+
+    //2)Sorting:
+    let query = Tour.find(JSON.parse(queryStr));
+    //--check if request contain sort
+    if (req.query.sort) {
+      //--get sort then remove the camma and put space instead if the request sort on multiple documents
+      const sort = req.query.sort.split(',').join(' ');
+      query = query.sort(sort);
+    } else {
+      //if request doesnt want a sort, it will sort accourding to the new inserted tours in descending order (-)
+      query = query.sort('-createdAt');
+    }
     //--pass query object to the find
-    const tours = await Tour.find(JSON.parse(queryStr));
+    const tours = await query;
     res.status(200).json({ status: 'success', results: tours.length, data: { tours } });
   } catch (err) {
     res.status(404).json({ status: 'fail', message: err });
