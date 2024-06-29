@@ -3,15 +3,24 @@ exports.getAllTours = async (req, res) => {
   try {
     //get all tours code Here ...
 
-    //1)Filtering: remove unwanted objects from the request query
+    //1-A)Filtering: remove unwanted objects from the request query
     //-a-get query request
     const queryObj = { ...req.query }; //here we make a hard copy of the query request
+
     //-b-create array of excluded fields
     const excluded = ['sort', 'limit', 'page', 'fields'];
+
     //-c-remove the execluded field from the query copy
     excluded.forEach(el => delete queryObj[el]);
-    //-d-pass query object to the find
-    const tours = await Tour.find(queryObj);
+
+    // 1-B)Filtering;
+    //-a-stringify request
+    let queryStr = JSON.stringify(queryObj);
+
+    //-b-search for operation and add $ before
+    queryStr = queryStr.replace(/\b(gt|lt|gte|lte)\b/g, match => `$${match}`);
+    //--pass query object to the find
+    const tours = await Tour.find(JSON.parse(queryStr));
     res.status(200).json({ status: 'success', results: tours.length, data: { tours } });
   } catch (err) {
     res.status(404).json({ status: 'fail', message: err });
