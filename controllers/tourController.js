@@ -1,56 +1,15 @@
 const Tour = require('./../models/tourModel');
+const queryBuilder = require('./../util/queryBuilder');
 exports.getAllTours = async (req, res) => {
   try {
-    //get all tours code Here ...
-
-    //1-A)Filtering: remove unwanted objects from the request query
-    //-a-get query request
-    const queryObj = { ...req.query }; //here we make a hard copy of the query request
-    //-b-create array of excluded fields
-    const excluded = ['sort', 'limit', 'page', 'fields'];
-    //-c-remove the execluded field from the query copy
-    excluded.forEach(el => delete queryObj[el]);
-
-    // 1-B)Filtering;
-    //-a-stringify request
-    let queryStr = JSON.stringify(queryObj);
-    //-b-search for operation and add $ before
-    queryStr = queryStr.replace(/\b(gt|lt|gte|lte)\b/g, match => `$${match}`);
-
-    //2)Sorting:
-    let query = Tour.find(JSON.parse(queryStr));
-    //--check if request contains sort
-    if (req.query.sort) {
-      //--get sort then remove the camma and put space instead if the request sort on multiple documents
-      const sort = req.query.sort.split(',').join(' ');
-      //add the sort to the query
-      query = query.sort(sort);
+    let tours;
+    if (req.query) {
+      const finalQuery = new queryBuilder(req.query, Tour).filter().sort().limitFields().paginate();
+      tours = await finalQuery.mongooseQuery;
     } else {
-      //if request doesnt want a sort, it will sort accourding to the new inserted tours in descending order (-)
-      query = query.sort('-createdAt');
-    }
-    //3)Fields: get a selected fields only
-    //--check if request contains fields
-    if (req.query.fields) {
-      //--remove the comma and add a space instead if the request want multiple fields
-      const fields = req.query.fields.split(',').join(' ');
-      //--add  fields to the query
-      query = query.select(fields);
-    } else {
-      //-- if the request doesnt have fields then remove the __v from the responsed fields
-      query = query.select('-__v');
+      tours = await Tour.find();
     }
 
-    // 4) pagination
-    //--get page and limit from query
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
-    //--calculate the number of skipped documents
-    const skip = (page - 1) * limit;
-    //--add number of skipped documents and limit of documents to the query object
-    query = query.skip(skip).limit(limit);
-    //--pass query object to the find
-    const tours = await query;
     res.status(200).json({ status: 'success', results: tours.length, data: { tours } });
   } catch (err) {
     res.status(404).json({ status: 'fail', message: err });
