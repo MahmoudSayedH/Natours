@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const slugify = require('slugify');
 //create schema
 const tourSchema = new mongoose.Schema(
   {
@@ -9,6 +9,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
@@ -61,6 +62,19 @@ const tourSchema = new mongoose.Schema(
 //add virtual field which is not saved in the database but calculated when we query data
 tourSchema.virtual('durationInWeeks').get(function () {
   return this.duration / 7;
+});
+
+//mongoose document middleware:
+//this middlware is triggered only on save or create and activated before it save
+tourSchema.pre('save', function (next) {
+  // set the slug field based on the name
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+//the post property make a middleware affter the hook is triggered
+tourSchema.post('save', function (doc, next) {
+  console.log(doc);
+  next();
 });
 
 //create model
