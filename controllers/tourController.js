@@ -23,6 +23,40 @@ exports.getAllTours = async (req, res) => {
   }
 };
 
+exports.getStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        //get all tours whose rating Average is greater than or equal 4.5
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        // structur of the response...
+        $group: {
+          _id: { $toUpper: '$difficulty' }, //group by difficulty and set its text letters to UPPER
+          count: { $sum: 1 }, //count the nuber of the tours for each group
+          minPrice: { $min: '$price' }, //get the minimum price
+          maxPrice: { $max: '$price' }, // get the maximum price
+          sumOfPrice: { $sum: '$price' },
+        },
+      },
+      {
+        //we can attach $match as mutch as we want
+        $match: { _id: { $ne: 'EASY' } }, // remove the easy group
+      },
+      {
+        $sort: {
+          sumOfPrice: 1, //sort the groups in ascending order
+        },
+      },
+    ]);
+
+    res.status(200).json({ status: 'success', data: { stats } });
+  } catch (err) {
+    res.status(400).json({ status: 'fail', message: err });
+  }
+};
+
 exports.createTour = async (req, res) => {
   try {
     // create tour Here ...
