@@ -55,6 +55,10 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false, //make it by default not getted in the select
     },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
     startDates: [Date],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
@@ -77,6 +81,15 @@ tourSchema.post('save', function (doc, next) {
   next();
 });
 
+//Query middleware:
+tourSchema.pre(/^find/, function (next) {
+  // /^find/==> hundle all querys the starts with find
+  // we want to get all the tour except the secret tours:
+  this.find({
+    secretTour: { $ne: true },
+  });
+  next();
+});
 //create model
 const Tour = mongoose.model('Tour', tourSchema);
 
