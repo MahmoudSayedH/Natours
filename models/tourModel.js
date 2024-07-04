@@ -90,6 +90,11 @@ tourSchema.pre(/^find/, function (next) {
   });
   next();
 });
+// aggregation middleware:
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); // add the match as first obj in the aggrigate pipline
+  next();
+});
 //create model
 const Tour = mongoose.model('Tour', tourSchema);
 

@@ -52,9 +52,9 @@ exports.monthlyPlan = async (req, res) => {
       {
         $project: { _id: 0 }, //hide unwanted field(_id)
       },
-      {
-        $limit: 12, //limoit the results get only 12 group this is optional
-      },
+      // {
+      //   $limit: 12, //limoit the results get only 12 group this is optional
+      // },
       {
         $sort: { count: -1 }, //sort the groups according to the number of tours in each in descending order
       },
