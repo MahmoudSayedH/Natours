@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 //create schema
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [5, 'The name must have at least 5 characters'],
       minlength: [25, 'The name cannt be more than 25 characters'],
+      validate: [validator.isAlpha, 'name must have only characters'],
     },
     slug: String,
     duration: {
@@ -28,6 +30,7 @@ const tourSchema = new mongoose.Schema(
         message: 'Difficulty is either: easy, medium or difficult',
       },
     },
+    // custom validators are boolean function
     ratingsAverage: {
       type: Number,
       default: 4.5,
@@ -44,7 +47,16 @@ const tourSchema = new mongoose.Schema(
       min: [0, 'The price cannt be lower than zero'],
       max: [9999, 'The price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        // this is points on NEW documents only not UPDATE
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: 'Discount value {VALUE} cannt be greater than price',
+      },
+    },
     summary: {
       type: String,
       trim: true,
