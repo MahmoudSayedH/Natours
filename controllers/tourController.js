@@ -1,7 +1,7 @@
 const Tour = require('./../models/tourModel');
 const queryBuilder = require('./../util/queryBuilder');
 const catchAsync = require('./../util/catchAsync');
-
+const AppError = require('./../util/AppError');
 // CRUD OPERATIONS
 exports.getAllTours = catchAsync(async (req, res, next) => {
   let tours;
@@ -17,23 +17,37 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.createTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.create(req.body); // creat similar to save but it doesnt need instance of Tour
+  if (!tour) return next(new AppError(`There is tour with the id ${id}`), 404);
+
   res.status(201).json({ status: 'success', data: { tour } }); //send response of the new tour
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
   //get single tour code Here....
-  const tour = await Tour.findById(req.params.id);
-  res.status(200).json({ status: 'success', data: { tour } });
+
+  const { id } = req.params;
+  const tour = await Tour.findById(id);
+
+  if (!tour) return next(new AppError(`There is tour with the id ${id}`), 404);
+
+  res.status(200).json({
+    status: 'success',
+    data: { tour },
+  });
 });
 
 exports.updateTour = catchAsync(async (req, res, next) => {
   //update tour code Here....
   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }); //new-->return the new updated doc & runValidator validate the new insertion
+  if (!tour) return next(new AppError(`There is tour with the id ${id}`), 404);
+
   res.status(200).json({ status: 'success', data: { tour } });
 });
 exports.deleteTour = catchAsync(async (req, res, next) => {
   //delete tour code Here....
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+
+  if (!tour) return next(new AppError(`There is tour with the id ${id}`), 404);
   res.status(204).json({ status: 'success', data: null });
 });
 
