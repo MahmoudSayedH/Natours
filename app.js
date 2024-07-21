@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const AppError = require('./util/AppError');
+const globalError = require('./middlewares/globalErrorMiddleware');
 //Middlewares
 app.use(express.json());
 //check if environment variable is development and run morgan
@@ -18,18 +19,8 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.all('*', (req, res, next) => {
-  // res.status(404).json({ status: 'fail', message: `Can't find ${req.originalUrl} on this server` });
-  // const err = new Error(`Can't find ${req.originalUrl} on this server`);
-  // err.statusCode = 404;
-  // err.status = 'fail';
-  // next(err);
-
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 400));
 });
 
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
-  res.status(err.statusCode).json({ status: err.status, message: err.message });
-});
+app.use(globalError);
 module.exports = app;
