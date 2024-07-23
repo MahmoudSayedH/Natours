@@ -4,6 +4,11 @@ dotenv.config(); //add enviroment variables found in the file .env
 const mongoose = require('mongoose');
 const app = require('./app');
 
+process.on('uncaughtException', err => {
+  console.log(err.name, err.message); //dispkay the error
+  //close the app
+  process.exit(1);
+});
 //connecting to database
 const db =
   //process.env.DATABASE_ATLAS_URL.replace('<PASSWORD>', process.env.DATABASE_ATLAS_PASSWORD) ||
