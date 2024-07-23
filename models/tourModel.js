@@ -9,8 +9,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       unique: true,
       trim: true,
-      maxlength: [5, 'The name must have at least 5 characters'],
-      minlength: [25, 'The name cannt be more than 25 characters'],
+      minlength: [5, 'The name must have at least 5 characters'],
+      maxlength: [25, 'The name cannt be more than 25 characters'],
       // validate: [validator.isAlpha, 'name must have only characters'],//validator dont allow spaces in the name
       match: [/^[a-zA-Z\s]+$/, 'Name must contain only alphabetic characters'], //this validate the name and escape the spaces
     },
