@@ -32,6 +32,10 @@ const userSchema = mongoose.Schema({
   },
 });
 
+userSchema.methods.isCorrectPassword = async (condidcatePassword, hashPassword) => {
+  return bcrypt.compare(condidcatePassword, hashPassword);
+};
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
