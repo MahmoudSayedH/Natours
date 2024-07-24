@@ -1,7 +1,7 @@
 const AppError = require('./../util/AppError');
 
 const handleCasteErrorDB = err => new AppError(`Invalid ${err.path}: ${err.value}`, 404);
-const handleDuplicateFieldsDB = err => new AppError(`The id: "${err.keyValue.name}" is already taken`, 404);
+const handleDuplicateFieldsDB = err => new AppError(`${Object.values(err.keyValue)[0]} already exist`, 404);
 const handleValidationErrorDB = err => {
   const message = Object.values(err.errors).map(el => {
     return { [el.path]: el.message };
