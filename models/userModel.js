@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const { validate } = require('./tourModel');
 const userSchema = mongoose.Schema({
   name: {
     type: String,
@@ -22,6 +23,12 @@ const userSchema = mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'please confirm password'],
+    validate: {
+      validator: function (value) {
+        return value === this.password;
+      },
+      message: 'password does not match',
+    },
   },
 });
 
