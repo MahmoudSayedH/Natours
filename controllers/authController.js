@@ -32,4 +32,18 @@ const login = catchAsync(async (req, res, next) => {
   const token = signupJWT(user._id);
   res.status(200).json({ status: 'success', token });
 });
-module.exports = { signup, login };
+
+const protect = catchAsync(async (req, res, next) => {
+  //check if the token found in the request headers and start with bearer
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startswith('bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('You are not logged in, please login to get access '), 401);
+  }
+
+  next();
+});
+module.exports = { signup, login, protect };
