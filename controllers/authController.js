@@ -3,6 +3,7 @@ const catchAsync = require('../util/catchAsync');
 const User = require('./../models/userModel');
 const jwt = require('jsonwebtoken');
 const AppError = require('./../util/AppError');
+const { use } = require('../routes/tourRoutes');
 
 const signupJWT = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED_IN });
@@ -47,7 +48,15 @@ const protect = catchAsync(async (req, res, next) => {
 
   // verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  // console.log(decoded);
+  const user = await User.findById(decoded.id);
+  if (!user) {
+    return next(new AppError('The user belonging to this token does no longer exist', 401));
+  }
+
+  if (user.isPasswordChangedAfter(decoded.iat)) {
+    return next(new AppError('User recently changed password! Please log in again', 401));
+  }
+  req.user = user;
   next();
 });
 module.exports = { signup, login, protect };
