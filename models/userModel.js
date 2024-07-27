@@ -30,6 +30,11 @@ const userSchema = mongoose.Schema({
       message: 'password does not match',
     },
   },
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user',
+  },
   passwordChangedAt: Date,
 });
 
@@ -38,7 +43,7 @@ userSchema.methods.isCorrectPassword = async (condidcatePassword, hashPassword) 
 };
 
 userSchema.methods.isPasswordChangedAfter = function (JWTTimeStamp) {
-  console.log(parseInt(this.passwordChangedAt.getTime() / 1000, 10) < JWTTimeStamp);
+  // console.log(parseInt(this.passwordChangedAt.getTime() / 1000, 10) < JWTTimeStamp);
   if (this.passwordChangedAt) return parseInt(this.passwordChangedAt.getTime() / 1000, 10) > JWTTimeStamp;
 
   return false;

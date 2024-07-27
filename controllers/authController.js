@@ -3,7 +3,6 @@ const catchAsync = require('../util/catchAsync');
 const User = require('./../models/userModel');
 const jwt = require('jsonwebtoken');
 const AppError = require('./../util/AppError');
-const { use } = require('../routes/tourRoutes');
 
 const signupJWT = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRED_IN });
@@ -15,6 +14,7 @@ const signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    role: req.body.role,
   });
 
   const token = signupJWT(user._id);
@@ -38,10 +38,10 @@ const login = catchAsync(async (req, res, next) => {
 const protect = catchAsync(async (req, res, next) => {
   //check if the token found in the request headers and start with bearer
   let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('bearer')) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
-
+  console.log(token);
   if (!token) {
     return next(new AppError('You are not logged in, please login to get access '), 401);
   }
@@ -59,4 +59,12 @@ const protect = catchAsync(async (req, res, next) => {
   req.user = user;
   next();
 });
-module.exports = { signup, login, protect };
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role))
+      return next(new AppError('you do not have permission to perform this action', 403));
+    next();
+  };
+};
+
+module.exports = { signup, login, protect, restrictTo };
