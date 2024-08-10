@@ -3,7 +3,6 @@ const app = require('./app');
 const mongoose = require('mongoose');
 
 // Handle Uncaught Exception
-
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
   console.log('UNCAUGHT EXCPECTION! 😈 Shutting down...');
@@ -15,6 +14,7 @@ dotenv.config();
 
 // DATABASE CONNECTION
 const MONGODB_URL = process.env.DATABASE_ATLAS_URL.replace('<PASSWORD>', process.env.DATABASE_ATLAS_PASSWORD);
+
 // const MONGODB_URL = process.env.DATABASE_LOCAL_URL;
 mongoose
   .connect(MONGODB_URL)
