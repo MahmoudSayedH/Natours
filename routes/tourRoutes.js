@@ -26,7 +26,10 @@ router
 
 router.route('/top-5-cheap-tours').get(topFiveCheapTours, getAllTours);
 
-router.route('/').get(getAllTours).post(protect, restrictTo('admin', 'lead-guide'), createTour);
+router
+  .route('/')
+  .get(getAllTours)
+  .post(protect, restrictTo('admin', 'lead-guide'), createTour);
 
 router
   .route('/:id')
